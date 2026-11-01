@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ORIENT'ONCOGÉNÉTIQUE — Repérage en pharmacie d'officine</title>
+<meta name="description" content="Outil d'aide à l'orientation vers une consultation d'oncogénétique pour les prédispositions aux cancers du sein et de l'ovaire, destiné aux professionnels de santé en pharmacie d'officine.">
+<style>
+:root{
+  --bleu:#14536b; --bleu-fonce:#0d3a4c; --bleu-clair:#e8f1f5;
+  --orange:#b4531d; --orange-clair:#fdf1e8;
+  --vert:#2c6a4f; --vert-clair:#e9f4ee;
+  --encre:#182a32; --gris:#5b6b74; --gris-clair:#eef2f4;
+  --bord:#d5e0e5; --fond:#f6f9fa; --blanc:#fff;
+  --r:10px;
+  --ombre:0 1px 2px rgba(20,60,80,.06), 0 6px 20px rgba(20,60,80,.06);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:var(--fond); color:var(--encre);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{line-height:1.25; margin:0 0 .5em; font-weight:700; letter-spacing:-.01em}
+h2{font-size:1.5rem; color:var(--bleu-fonce)}
+h3{font-size:1.1rem}
+p{margin:0 0 1em}
+a{color:var(--bleu)}
+.wrap{max-width:860px; margin:0 auto; padding:0 20px}
+.small{font-size:.875rem}
+.muted{color:var(--gris)}
+
+/* en-tête */
+header{background:linear-gradient(160deg,var(--bleu-fonce),var(--bleu)); color:#fff; padding:44px 0 40px}
+header .wrap{max-width:860px}
+.logo{display:inline-flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.06em; font-size:.8125rem; text-transform:uppercase; opacity:.85; margin-bottom:18px}
+.logo svg{flex:none}
+header h1{font-size:2rem; color:#fff; margin-bottom:.35em}
+header .tagline{font-size:1.0625rem; opacity:.92; max-width:56ch; margin-bottom:0}
+.btn-header{display:inline-block; background:#fff; color:var(--bleu-fonce); text-decoration:none; font-weight:650; font-size:.9375rem; padding:11px 20px; border-radius:8px}
+
+nav{background:var(--blanc); border-bottom:1px solid var(--bord); position:sticky; top:0; z-index:20}
+nav .wrap{display:flex; gap:4px; overflow-x:auto; padding:0 20px; scrollbar-width:none}
+nav .wrap::-webkit-scrollbar{display:none}
+nav a{
+  flex:none; padding:13px 12px; font-size:.875rem; font-weight:600; color:var(--gris);
+  text-decoration:none; border-bottom:2.5px solid transparent; white-space:nowrap;
+}
+nav a:hover{color:var(--bleu); border-color:var(--bleu-clair)}
+
+section{padding:44px 0; border-bottom:1px solid var(--bord)}
+section:last-of-type{border-bottom:0}
+.kicker{font-size:.75rem; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--bleu); margin-bottom:8px}
+
+/* cartes */
+.grid{display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.card{background:var(--blanc); border:1px solid var(--bord); border-radius:var(--r); padding:18px 20px; box-shadow:var(--ombre)}
+.card h3{margin-bottom:.35em; font-size:1rem}
+.card p:last-child{margin-bottom:0}
+
+.chiffres{display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); margin:18px 0 6px}
+.chiffre{background:var(--blanc); border:1px solid var(--bord); border-left:3px solid var(--bleu); border-radius:8px; padding:16px 18px}
+.chiffre .val{font-size:1.75rem; font-weight:800; color:var(--bleu); line-height:1.1; font-variant-numeric:tabular-nums}
+.chiffre .lab{font-size:.9375rem; margin-top:4px}
+
+.trigger{display:flex; gap:12px; align-items:flex-start; background:var(--blanc); border:1px solid var(--bord); border-left:3px solid var(--bleu); border-radius:8px; padding:14px 16px; margin-bottom:10px}
+.trigger .num{flex:none; width:26px; height:26px; border-radius:50%; background:var(--bleu-clair); color:var(--bleu-fonce); display:grid; place-items:center; font-weight:800; font-size:.8125rem}
+.trigger p{margin:0; font-size:.9375rem}
+
+/* outil */
+.outil{background:var(--blanc); border:1px solid var(--bord); border-radius:14px; box-shadow:var(--ombre); overflow:hidden}
+.outil-head{background:var(--bleu-clair); padding:18px 22px; border-bottom:1px solid var(--bord)}
+.outil-head h3{margin:0; color:var(--bleu-fonce)}
+.outil-head p{margin:.3em 0 0; font-size:.875rem; color:var(--gris)}
+.outil-body{padding:22px}
+
+.consigne{background:var(--orange-clair); border:1px solid #f0d5c0; border-radius:8px; padding:14px 16px; margin-bottom:14px; font-size:.9375rem}
+.consigne:last-of-type{margin-bottom:20px}
+.consigne strong{color:var(--orange)}
+.encadre-conf{background:var(--bleu-clair); border:1px solid #c3dae4; border-radius:8px; padding:14px 16px; margin-bottom:20px; font-size:.9375rem}
+.encadre-conf strong{color:var(--bleu-fonce)}
+.encadre-conf p:last-child{margin-bottom:0}
+
+fieldset{border:0; margin:0 0 18px; padding:0}
+legend{font-weight:700; font-size:.9375rem; margin-bottom:8px; padding:0}
+
+.cas{display:grid; grid-template-columns:1fr 1.3fr 96px auto; gap:8px; align-items:center; margin-bottom:8px}
+.cas-entete{font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--gris); margin-bottom:4px}
+.cas-entete span:last-child{text-align:right}
+@media(max-width:620px){
+  .cas-entete{display:none}
+  .cas{grid-template-columns:1fr; gap:6px; padding:12px; border:1px solid var(--bord); border-radius:8px; margin-bottom:12px}
+  .cas-actions{justify-content:space-between; border-top:1px solid var(--bord); padding-top:6px; margin-top:2px}
+  .pts{text-align:left}
+}
+input.age{
+  width:100%; padding:10px 10px; font:inherit; font-size:.9375rem; color:var(--encre);
+  background:var(--blanc); border:1px solid var(--bord); border-radius:8px;
+}
+input.age:focus{outline:2px solid var(--bleu); outline-offset:1px}
+input.age:disabled{background:var(--gris-clair); color:var(--gris)}
+
+select{
+  width:100%; padding:10px 12px; font:inherit; font-size:.9375rem; color:var(--encre);
+  background:var(--blanc); border:1px solid var(--bord); border-radius:8px;
+  -webkit-appearance:none; appearance:none;
+  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235b6b74' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 12px center; padding-right:34px;
+}
+select:focus{outline:2px solid var(--bleu); outline-offset:1px}
+.pts{font-variant-numeric:tabular-nums; font-weight:800; color:var(--bleu); min-width:60px; text-align:right; font-size:.875rem; line-height:1.3}
+.btn-suppr{background:none; border:0; color:var(--gris); font-size:1.25rem; cursor:pointer; line-height:1; padding:4px 8px; border-radius:6px}
+.btn-suppr:hover{background:var(--gris-clair); color:var(--orange)}
+.cas-actions{display:flex; align-items:center; gap:4px; justify-content:flex-end}
+
+button.btn{
+  font:inherit; font-weight:650; font-size:.9375rem; padding:11px 20px; border-radius:8px; cursor:pointer;
+  border:1px solid var(--bleu); background:var(--bleu); color:#fff; transition:background .15s;
+}
+button.btn:hover{background:var(--bleu-fonce)}
+button.btn.ghost{background:var(--blanc); color:var(--bleu)}
+button.btn.ghost:hover{background:var(--bleu-clair)}
+.btn-row{display:flex; gap:10px; flex-wrap:wrap; margin-top:6px}
+
+/* résultat */
+.resultat{margin-top:22px; border-radius:12px; padding:22px; border:1px solid var(--bord)}
+.resultat.neutre{background:var(--gris-clair); text-align:center; color:var(--gris)}
+.resultat.orienter{background:var(--orange-clair); border-color:#e8c3a5}
+.resultat.standard{background:var(--vert-clair); border-color:#c2ddcd}
+.score-ligne{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:14px}
+.score-val{font-size:2.5rem; font-weight:800; line-height:1; font-variant-numeric:tabular-nums}
+.orienter .score-val{color:var(--orange)}
+.standard .score-val{color:var(--vert)}
+.score-lab{font-weight:700; font-size:1.0625rem}
+
+.branches{display:grid; gap:10px; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); margin-bottom:10px}
+.branche{background:rgba(255,255,255,.75); border:1px solid var(--bord); border-radius:8px; padding:10px 12px}
+.branche .b-lab{font-size:.75rem; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:var(--gris)}
+.branche .b-val{font-size:1.5rem; font-weight:800; line-height:1.2; font-variant-numeric:tabular-nums; color:var(--bleu-fonce)}
+.branche.retenue{border-color:var(--bleu); border-width:2px}
+.branche .b-note{font-size:.75rem; color:var(--gris)}
+.regle-calcul{font-size:.8125rem; color:var(--gris); margin-bottom:14px}
+
+.conduite{background:rgba(255,255,255,.75); border-radius:8px; padding:14px 16px; font-size:.9375rem}
+.conduite ul{margin:.4em 0 0; padding-left:1.2em}
+.conduite li{margin-bottom:.4em}
+.conduite li:last-child{margin-bottom:0}
+.rappel-reeval{background:rgba(255,255,255,.75); border:1px dashed var(--gris); border-radius:8px; padding:11px 14px; font-size:.875rem; margin-top:12px}
+
+.lien-annuaire{display:inline-flex; align-items:center; gap:8px; background:var(--bleu); color:#fff; text-decoration:none; font-weight:650; font-size:.9375rem; padding:11px 18px; border-radius:8px; margin-top:4px}
+.lien-annuaire:hover{background:var(--bleu-fonce)}
+
+/* tableau du score */
+table{width:100%; border-collapse:collapse; font-size:.9375rem; background:var(--blanc); border:1px solid var(--bord); border-radius:var(--r); overflow:hidden}
+th,td{text-align:left; padding:9px 14px; border-bottom:1px solid var(--bord)}
+th{background:var(--bleu-clair); font-size:.8125rem; text-transform:uppercase; letter-spacing:.04em; color:var(--bleu-fonce)}
+table.score td:last-child,table.score th:last-child{text-align:right; font-variant-numeric:tabular-nums; font-weight:700; width:70px}
+tr:last-child td{border-bottom:0}
+
+/* ressources */
+.res{display:block; background:var(--blanc); border:1px solid var(--bord); border-radius:8px; padding:14px 16px; margin-bottom:10px; text-decoration:none; color:inherit; transition:border-color .15s}
+.res:hover{border-color:var(--bleu)}
+.res .t{font-weight:650; color:var(--bleu-fonce); font-size:.9375rem}
+.res .d{font-size:.8125rem; color:var(--gris); margin-top:2px}
+
+/* licence, pied de page */
+.licence{background:var(--blanc); border:1px solid var(--bord); border-radius:var(--r); padding:20px 22px; font-size:.9375rem}
+.cc{display:inline-flex; align-items:center; gap:8px; font-weight:800; letter-spacing:.05em; background:var(--encre); color:#fff; padding:5px 11px; border-radius:5px; font-size:.75rem; margin-bottom:12px}
+.credits{list-style:none; margin:0 0 1em; padding:0}
+.credits li{margin-bottom:.3em}
+footer{background:var(--encre); color:#b6c6ce; padding:32px 0; font-size:.8125rem}
+footer a{color:#9ecbdc}
+footer p{margin:0 0 .6em}
+
+/* impression */
+#print-root{display:none}
+#print-root h2{font-size:1.35rem; border-bottom:2px solid var(--bleu); padding-bottom:6px}
+#print-root .fbloc{margin-bottom:14px}
+#print-root .fbloc h3{font-size:1rem; color:var(--bleu-fonce); margin-bottom:.25em}
+#print-root .fbloc p, #print-root .fbloc li{font-size:.9375rem; margin-bottom:.35em}
+#print-root .fres{border:2px solid var(--encre); border-radius:8px; padding:12px 14px; margin-bottom:16px}
+#print-root .fpied{border-top:1px solid var(--bord); margin-top:16px; padding-top:10px; font-size:.75rem; color:var(--gris)}
+#print-root .fbranches{display:flex; gap:10px; flex-wrap:wrap; margin:8px 0 0}
+#print-root .fbranches div{border:1px solid var(--encre); border-radius:6px; padding:6px 10px; font-size:.875rem}
+table.recueil td{height:30px}
+table.recueil th{font-size:.75rem}
+table.recueil th + th, table.recueil td + td{border-left:1px solid var(--bord)}
+table.recueil tbody tr:nth-child(even) td{background:var(--gris-clair)}
+
+/* questionnaire */
+.questionnaire{background:var(--blanc); border:1px solid var(--bord); border-radius:14px; box-shadow:var(--ombre); padding:22px}
+.questionnaire .btn-row{align-items:center}
+.questionnaire .lien-secours{font-size:.875rem}
+.questionnaire iframe{display:block; width:100%; height:80vh; min-height:640px; border:1px solid var(--bord); border-radius:8px; margin-top:16px; background:var(--blanc)}
+/* fiche patient (une page A4, tailles en em, --fs réglé en JS) */
+#fiche{--fs:1; font-size:calc(10.5pt * var(--fs)); line-height:1.35}
+#fiche h2{font-size:1.45em; padding-bottom:.18em; margin-bottom:.3em}
+#fiche > p.small{font-size:.82em; margin-bottom:.6em}
+#fiche .fres{padding:.6em .8em; margin-bottom:.7em; border-width:1.5px}
+#fiche .fres p{margin:.4em 0 0}
+#fiche .fbloc{margin-bottom:.7em}
+#fiche .fbloc h3{font-size:1.02em; margin-bottom:.12em}
+#fiche .fbloc p, #fiche .fbloc li{font-size:.92em; margin-bottom:.15em}
+#fiche ul, #fiche ol{margin:.15em 0 .35em; padding-left:1.25em}
+#fiche .fbranches{gap:.5em; margin-top:.4em}
+#fiche .fbranches div{padding:.28em .6em; font-size:.85em; border-radius:4px}
+#fiche .fpied{margin-top:auto; padding-top:.5em; font-size:.72em; line-height:1.25}
+
+@media print{
+  body{background:#fff; font-size:10.5pt; color:#000}
+  body > *{display:none !important}
+  #print-root{display:block !important}
+  #print-root > *{display:none !important}
+  body.print-fiche #print-root > #fiche{
+    display:flex !important; flex-direction:column;
+    height:var(--page-h, 268mm); overflow:hidden;
+    page-break-after:avoid; break-after:avoid;
+  }
+  body.print-grille #print-root > #grille{display:block !important}
+  .no-print{display:none !important}
+  a{color:#000; text-decoration:none}
+  table{border:1px solid #000}
+  th,td{border-bottom:1px solid #666}
+  th{background:#e8f1f5 !important; -webkit-print-color-adjust:exact; print-color-adjust:exact}
+  @page{size:A4; margin:14mm}
+
+  /* grille de recueil */
+  body.print-grille #print-root > #grille{
+    display:flex !important; flex-direction:column;
+    height:var(--page-h, 268mm); overflow:hidden; page-break-after:avoid; break-after:avoid;
+  }
+  /* padding-bottom : évite que la bordure basse du tableau soit rognée */
+  body.print-grille #grille .fbloc-cas{flex:1 1 auto; display:flex; flex-direction:column; min-height:0; padding-bottom:2px}
+  body.print-grille #grille .fbloc-cas table{flex:1 1 auto}
+
+  body.print-grille{font-size:9pt; line-height:1.3}
+  body.print-grille #grille h2{font-size:1.15rem; padding-bottom:4px; margin-bottom:.3em}
+  body.print-grille #grille > p.small{margin-bottom:.6em}
+  body.print-grille #grille .fbloc{margin-bottom:8px; page-break-inside:avoid; break-inside:avoid}
+  body.print-grille #grille .fbloc h3{font-size:.95rem; margin-bottom:.15em}
+  body.print-grille #grille .fbloc p{font-size:.85rem; margin-bottom:.25em}
+  body.print-grille #grille table{page-break-inside:avoid; break-inside:avoid}
+  body.print-grille #grille th,
+  body.print-grille #grille td{padding:3px 8px; font-size:.85rem}
+  body.print-grille #grille th{font-size:.7rem; letter-spacing:.02em}
+  body.print-grille #grille table.recueil td{height:20px}
+  body.print-grille #grille table.recueil th + th,
+  body.print-grille #grille table.recueil td + td{border-left:1px solid #666}
+  body.print-grille #grille table.recueil tbody tr:nth-child(even) td{
+    background:#e9eef1 !important; -webkit-print-color-adjust:exact; print-color-adjust:exact;
+  }
+  body.print-grille #grille .fbranches{gap:8px; margin-top:6px}
+  body.print-grille #grille .fbranches div{padding:4px 8px; font-size:.8rem}
+  body.print-grille #grille .fpied{margin-top:10px; padding-top:6px; font-size:.68rem; line-height:1.25}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="logo">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg>
+      Orient'Oncogénétique
+    </div>
+    <h1>Repérer en pharmacie d'officine les personnes susceptibles de relever d'une consultation d'oncogénétique</h1>
+    <p class="tagline">Prédispositions héréditaires aux cancers du sein et de l'ovaire. Une check-list rapide, fondée sur le score d'Eisinger, à l'usage des professionnels de santé en pharmacie d'officine.</p>
+    <p style="margin:22px 0 0"><a class="btn-header" href="#outil">Ouvrir la check-list →</a></p>
+  </div>
+</header>
+
+<nav>
+  <div class="wrap">
+    <a href="#pourquoi">Le problème</a>
+    <a href="#reperage">Repérage</a>
+    <a href="#outil">La check-list</a>
+    <a href="#score">Le score</a>
+    <a href="#ressources">Pour aller plus loin</a>
+    <a href="#evaluation">Donner votre avis</a>
+    <a href="#licence">Licence &amp; crédits</a>
+  </div>
+</nav>
+
+<section id="pourquoi">
+  <div class="wrap">
+    <p class="kicker">Le problème</p>
+    <h2>Des personnes à haut risque passent chaque semaine dans votre pharmacie</h2>
+    <p>Une part des cancers du sein et de l'ovaire relève d'une prédisposition héréditaire. Une partie de ces familles n'est jamais orientée vers une consultation d'oncogénétique, alors qu'un suivi adapté existe et modifie le pronostic.</p>
+
+    <div class="chiffres">
+      <div class="chiffre">
+        <div class="val">5 à 10 %</div>
+        <div class="lab">des <strong>cancers du sein</strong> sont liés à une prédisposition héréditaire.</div>
+      </div>
+      <div class="chiffre">
+        <div class="val">10 à 15 %</div>
+        <div class="lab">des <strong>cancers de l'ovaire</strong> sont liés à une prédisposition héréditaire.</div>
+      </div>
+    </div>
+    <p class="small muted">Ces deux ordres de grandeur sont distincts : ils ne se cumulent pas et ne s'appliquent pas aux autres localisations.</p>
+
+    <h3 style="margin-top:26px">La place du professionnel de santé en pharmacie d'officine</h3>
+    <p>La pharmacie est un lieu de santé accessible sans rendez-vous et sans avance de frais. L'histoire familiale s'y invite souvent spontanément dans la conversation : à la délivrance d'un traitement, lors d'une question sur le dépistage, ou à l'occasion de l'annonce d'un cancer chez un proche. Le professionnel de santé en pharmacie d'officine est alors en position d'entendre cette information, de la structurer et, si elle le justifie, de proposer un avis médical.</p>
+
+    <div class="grid" style="margin-top:22px">
+      <div class="card"><h3>Ce que fait l'outil</h3><p class="small">Il structure le recueil de l'histoire personnelle et familiale de cancers du <strong>sein et de l'ovaire</strong>, calcule le score d'Eisinger <em>par branche parentale</em>, et formule une conduite à tenir.</p></div>
+      <div class="card"><h3>Ce qu'il ne fait pas</h3><p class="small">L'outil n'a <strong>pas de visée diagnostique</strong> et ne se substitue ni au médecin traitant ni à l'oncogénéticien.<br><br>Il est <strong>centré sur les prédispositions aux cancers du sein et/ou de l'ovaire</strong>.  Le score d'Eisinger n'est pas adapté, à lui seul, aux autres antécédents de cancers. En cas de doute, orienter vers un médecin.</p></div>
+      <div class="card"><h3>Confidentialité</h3><p class="small">La check-list n'enregistre ni ne transmet aucune donnée : tout le calcul se fait dans votre navigateur.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="reperage" style="background:var(--gris-clair)">
+  <div class="wrap">
+    <p class="kicker">Repérage</p>
+    <h2>Les situations qui doivent faire ouvrir la check-list</h2>
+
+    <h3 style="margin-top:18px">Situations principales</h3>
+    <p class="small muted">À elles seules, elles justifient de proposer la check-list.</p>
+    <div class="trigger"><span class="num">1</span><p>La personne exprime une <strong>inquiétude</strong> parce qu'un cancer du sein ou de l'ovaire est survenu chez un proche : mère, sœur, fille, tante, grand-mère.</p></div>
+    <div class="trigger"><span class="num">2</span><p>Un cancer du sein ou de l'ovaire <strong>avant 50 ans</strong> est mentionné, chez la personne ou dans sa famille.</p></div>
+    <div class="trigger"><span class="num">3</span><p>Un <strong>cancer du sein chez un homme</strong> est signalé dans la famille — situation rare qui pèse lourd dans le score.</p></div>
+    <div class="trigger"><span class="num">4</span><p>Une <strong>mutation BRCA1 ou BRCA2</strong> a été identifiée chez un apparenté, et la personne elle-même n'a jamais consulté.</p></div>
+
+    <h3 style="margin-top:22px">Situations secondaires</h3>
+    <p class="small muted">Moins spécifiques : elles invitent à poser la question des antécédents familiaux, puis à ouvrir la check-list si elle est pertinente.</p>
+    <div class="trigger" style="border-left-color:var(--gris)"><span class="num">5</span><p>La personne demande conseil sur son dépistage ou sollicite un examen mammaire précoce.</p></div>
+    <div class="trigger" style="border-left-color:var(--gris)"><span class="num">6</span><p>Vous délivrez une <strong>hormonothérapie adjuvante</strong> du cancer du sein (tamoxifène, anastrozole, létrozole, exémestane) à une personne qui n'a pas eu de consultation d'oncogénétique.</p></div>
+
+    <div class="encadre-conf" style="margin:22px 0 0">
+      <p><strong>Situations particulières</strong></p>
+      <p><strong>Prédisposition génétique déjà identifiée :</strong></p>
+      <p>Lorsque la personne est <strong>déjà suivie en oncogénétique pour une prédisposition génétique identifiée</strong> (<em>BRCA1</em>, <em>BRCA2</em> ou autre gène de prédisposition), il n'est pas nécessaire de réaliser la check-list. Le rôle du pharmacien est alors de l'encourager à poursuivre son suivi et, si besoin, de l'orienter vers son équipe médicale ou vers les associations de patients (voir « Pour aller plus loin »).</p>
+      <p><strong>Traitement par inhibiteur de PARP :</strong></p>
+      <p>Chez les personnes traitées par un inhibiteur de PARP (olaparib, niraparib, rucaparib, talazoparib), il convient de vérifier si une consultation d'oncogénétique a déjà eu lieu. En effet, ce traitement ne signifie pas systématiquement qu'une prédisposition héréditaire a été identifiée. En l'absence de consultation connue, un échange avec le médecin référent peut être proposé afin d'évaluer la nécessité d'une orientation.</p>
+    </div>
+    <p class="small muted" style="margin-top:16px">Ces situations sont des portes d'entrée, pas des critères. Seule la check-list détermine le message à délivrer.</p>
+  </div>
+</section>
+
+<section id="outil">
+  <div class="wrap">
+    <p class="kicker">L'outil</p>
+    <h2>La check-list d'orientation</h2>
+    <p>La check-list est le cœur de l'outil. Recensez les cancers du sein et de l'ovaire survenus dans la famille de la personne, un par ligne, en précisant la branche à laquelle appartient chaque cas et l'âge au diagnostic.</p>
+
+    <div class="encadre-conf">
+      <p><strong>Avant de commencer : privilégier un échange confidentiel.</strong>
+Le recueil de l’histoire personnelle et familiale nécessite un cadre adapté : espace de confidentialité de l’officine ou moment permettant un échange discret. Lorsque la situation s’y prête, proposer un entretien dans l’espace de confidentialité, notamment chez les patients sous anticancéreux oraux (ex. tamoxifène, anastrozole, létrozole, exémestane).
+<br><br><i>Si les conditions ne permettent pas un échange suffisamment confidentiel, ou si certaines informations familiales sont inconnues, une fiche de recueil peut être remise à la personne afin qu’elle complète ses antécédents à domicile avant de revenir à l’officine.</i></p>
+      <div class="btn-row"><button class="btn" type="button" id="imprimer-recueil">Imprimer la fiche de recueil des antécédents</button></div>
+    </div>
+
+    <div class="outil">
+
+      <div class="outil-head">
+        <h3>Score d'Eisinger — calcul par branche parentale</h3>
+        <p>Institut national du cancer, d'après Eisinger F. et al., <em>Bull Cancer</em> 2004.</p>
+      </div>
+      <div class="outil-body">
+
+        <div class="consigne">
+          <strong>Règle essentielle :</strong> les points ne s'additionnent qu'entre cas d'une <strong>même branche</strong> (maternelle ou paternelle). Un cancer chez la mère et un cancer chez une tante paternelle ne s'additionnent pas. Les antécédents de la personne elle-même comptent dans les deux branches.
+        </div>
+
+        <div class="consigne">
+          <strong>Si l'histoire familiale change, le score doit être réévalué.</strong> Tout nouveau cas de cancer dans la famille, ou toute précision obtenue sur l'âge au diagnostic ou l'organe atteint, peut modifier le résultat et justifie de refaire la check-list.
+        </div>
+
+        <fieldset>
+          <legend>Cas de cancer dans la famille</legend>
+          <div class="cas cas-entete" aria-hidden="true"><span>Qui ?</span><span>Cancer</span><span>Âge au diag.</span><span>Points</span></div>
+          <div id="liste-cas"></div>
+          <div class="btn-row">
+            <button class="btn ghost" type="button" id="ajouter">+ Ajouter un cas</button>
+            <button class="btn ghost" type="button" id="reinit">Réinitialiser</button>
+          </div>
+        </fieldset>
+
+        <div class="resultat neutre" id="resultat">Renseignez au moins un cas pour obtenir le score et la conduite à tenir.</div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section id="score" style="background:var(--gris-clair)">
+  <div class="wrap">
+    <p class="kicker">Référentiel</p>
+    <h2>Le score d'Eisinger en une page</h2>
+    <table class="score">
+      <thead><tr><th>Antécédent, dans une même branche parentale</th><th>Points</th></tr></thead>
+      <tbody>
+        <tr><td>Mutation BRCA1 ou BRCA2 identifiée dans la famille</td><td>5</td></tr>
+        <tr><td>Cancer du sein chez une femme avant 30 ans</td><td>4</td></tr>
+        <tr><td>Cancer du sein chez un homme</td><td>4</td></tr>
+        <tr><td>Cancer de l'ovaire avant 70 ans</td><td>4</td></tr>
+        <tr><td>Cancer du sein chez une femme entre 30 et 39 ans</td><td>3</td></tr>
+        <tr><td>Cancer du sein chez une femme entre 40 et 49 ans</td><td>2</td></tr>
+        <tr><td>Cancer du sein chez une femme entre 50 et 70 ans</td><td>1</td></tr>
+      </tbody>
+    </table>
+    <div class="grid" style="margin-top:16px">
+      <div class="card" style="border-left:3px solid var(--vert)"><h3>Score inférieur à 3</h3><p class="small">Pas d'indication à une consultation d'oncogénétique sur ce seul critère. Dépistage selon les recommandations en vigueur.</p></div>
+      <div class="card" style="border-left:3px solid var(--orange)"><h3>Score de 3 ou plus</h3><p class="small">Indication à une consultation d'oncogénétique, à confirmer par un médecin.</p></div>
+    </div>
+    <p class="small muted" style="margin-top:16px"><strong>Note méthodologique.</strong> La publication princeps d'Eisinger (2004) cote le cancer de l'ovaire 3 points et propose une gradation en trois paliers (1–2 : utilité médicale faible ; 3–4 : indication possible ; ≥ 5 : excellente indication). L'outil retient la version opérationnelle diffusée par l'Institut national du cancer (ovaire avant 70 ans : 4 points ; seuil unique à 3), celle qui est utilisée en pratique courante en France.</p>
+    <p class="small muted"><strong>Périmètre.</strong> Ce score évalue la probabilité d'une prédisposition héréditaire aux cancers du sein et de l'ovaire. Il ne couvre pas les autres syndromes de prédisposition, qui relèvent d'autres critères et d'une évaluation médicale.</p>
+
+  </div>
+</section>
+
+<section id="ressources">
+  <div class="wrap">
+    <p class="kicker">Pour aller plus loin</p>
+    <h2>Pour aller plus loin</h2>
+    <p class="small muted">Sources institutionnelles et documents d'information validés.</p>
+
+    <h3 style="font-size:.9375rem; text-transform:uppercase; letter-spacing:.05em; color:var(--gris); margin-top:18px">Trouver une consultation</h3>
+    <a class="res" href="https://www.cancer.fr/professionnels-de-sante/l-organisation-de-l-offre-de-soins/organisation-des-soins-pour-les-predispositions-genetiques/le-dispositif-national-d-oncogenetique" target="_blank" rel="noopener">
+      <span class="t">Institut national du cancer — Dispositif national d'oncogénétique</span>
+      <span class="d">Carte de France et annuaire complet des sites de consultation, au format PDF téléchargeable.</span>
+    </a>
+    <a class="res" href="https://www.aphp.fr/consultation-doncogenetique" target="_blank" rel="noopener">
+      <span class="t">AP-HP — Consultation d'oncogénétique</span>
+      <span class="d">Déroulé de la consultation et coordonnées pour l'Île-de-France.</span>
+    </a>
+
+    <h3 style="font-size:.9375rem; text-transform:uppercase; letter-spacing:.05em; color:var(--gris); margin-top:24px">Expliquer à la personne</h3>
+    <a class="res" href="https://www.cancer.fr/personnes-malades/parcours-de-soins/temps-d-annonce/consultation-d-oncogenetique" target="_blank" rel="noopener">
+      <span class="t">Institut national du cancer — La consultation d'oncogénétique</span>
+      <span class="d">À quoi elle sert, comment elle se déroule, ce qu'implique un test génétique.</span>
+    </a>
+    <!-- <a class="res" href="https://www.gustaveroussy.fr/sites/default/files/haut-risque-cancer-seins-11-08-15-curie.pdf" target="_blank" rel="noopener">
+      <span class="t">Gustave Roussy &amp; Institut Curie — Carnet d'information des femmes à haut risque de cancer du sein</span>
+      <span class="d">Livret complet sur le suivi et les mesures de prévention.</span>
+    </a> -->
+    <a class="res" href="https://www.youtube.com/watch?v=XG0jhdITXBg" target="_blank" rel="noopener">
+      <span class="t">Institut Curie — La prédisposition au cancer du sein et de l'ovaire (vidéo)</span>
+      <span class="d">Support d'information à montrer ou à envoyer à la personne.</span>
+    </a>
+    <a class="res" href="https://www.youtube.com/watch?v=KMxWc9Lu-FE" target="_blank" rel="noopener">
+      <span class="t">Institut Curie — La recherche d'une prédisposition, Dr Emmanuelle Mouret-Fourme (vidéo)</span>
+      <span class="d">Déroulé concret de la démarche d'oncogénétique.</span>
+    </a>
+    <!-- <a class="res" href="https://www.oncogenetique.fr/fiche/les-outils-score-eisinger-arbre-genealogique/" target="_blank" rel="noopener">
+      <span class="t">OncoGenetique.fr — Le score d'Eisinger et l'arbre généalogique</span>
+      <span class="d">Les deux outils utilisés avant un éventuel test génétique, expliqués simplement.</span>
+    </a> -->
+
+    <h3 style="font-size:.9375rem; text-transform:uppercase; letter-spacing:.05em; color:var(--gris); margin-top:24px">Votre patient est déjà porteur d'une prédisposition</h3>
+    <p class="small muted">Si la personne vous indique être déjà porteuse d'une prédisposition identifiée, des associations de patients proposent écoute, information et partage d'expérience.</p>
+    <a class="res" href="https://www.brcafrance.fr/association-brca" target="_blank" rel="noopener">
+      <span class="t">Association BRCA France</span>
+      <span class="d">Association de personnes porteuses d'une mutation BRCA1 ou BRCA2 et de leurs proches.</span>
+    </a>
+    <a class="res" href="https://www.geneticancer.org" target="_blank" rel="noopener">
+      <span class="t">Geneticancer</span>
+      <span class="d">Association d'information et d'accompagnement des personnes concernées par une prédisposition génétique au cancer.</span>
+    </a>
+  </div>
+</section>
+
+<section id="evaluation">
+  <div class="wrap">
+    <p class="kicker">Thèse d'exercice</p>
+    <h2>Donner votre avis sur Orient'Oncogénétique</h2>
+    <p>Vous avez consulté ou utilisé l'outil ? Ce questionnaire évalue sa faisabilité en pratique officinale, dans le cadre de la thèse d'exercice en pharmacie d'Adèle Raffalli. Il est <strong>anonyme</strong> et prend <strong>moins de 5 minutes</strong>.</p>
+    <div class="questionnaire" id="questionnaire">
+      <p class="small muted" style="margin-bottom:12px">Le questionnaire est hébergé par Google Forms. Il ne se charge sur cette page que lorsque vous cliquez sur « Répondre au questionnaire ».</p>
+      <div id="questionnaire-zone"></div>
+    </div>
+  </div>
+</section>
+
+<section id="licence" style="background:var(--gris-clair)">
+  <div class="wrap">
+    <p class="kicker">Droits</p>
+    <h2>Licence, crédits et sources</h2>
+    <div class="licence">
+      <!-- <span class="cc">© 2026 Adèle Raffalli – Orient’Oncogénétique | CC BY-NC 4.0</span> -->
+      <!-- <p><strong>Orient'Oncogénétique</strong> — outil d'aide à l'orientation vers une consultation d'oncogénétique, destiné aux professionnels de santé en pharmacie d'officine. © <span id="annee">2026</span>.</p> -->
+      <p>© 2026 Adèle Raffalli – Orient’Oncogénétique | CC BY-NC 4.0</p>
+
+      <h3 style="font-size:1rem">Conception et réalisation</h3>
+      <ul class="credits small">
+        <li><strong>Adèle Raffalli</strong> — conception de l'outil, recherche bibliographique, rédaction des contenus. Travail réalisé dans le cadre d'une thèse d'exercice en pharmacie.</li>
+        <li><strong>Khalil Bibi</strong> — développement du site.</li>
+        <li>Travail encadré par les directrices de thèse :<strong> Dr Léa Veyrune</strong> et <strong>Dr Emmanuelle Mouret-Fourme</strong></li>
+      </ul>
+
+      <!-- <p>Cet outil est diffusé sous licence <a href="https://creativecommons.org/licenses/by-nc/4.0/deed.fr" target="_blank" rel="noopener">Creative Commons Attribution — Pas d'Utilisation Commerciale 4.0 International</a>. Vous êtes libre de le partager, de le reproduire et de l'adapter, à deux conditions : <strong>citer nommément les auteurs</strong> et le titre de l'outil sur toute copie ou adaptation, et <strong>n'en faire aucun usage commercial</strong>. Les auteurs conservent leur droit moral, qui est perpétuel, inaliénable et imprescriptible.</p> -->
+      <!-- <p class="small muted">Le score d'Eisinger est un instrument clinique publié et diffusé par les autorités sanitaires françaises (Institut national du cancer, Haute Autorité de santé). Sa reprise s'accompagne ici de la citation de la publication princeps, conformément à l'usage scientifique. Les logos, chartes graphiques et documents des institutions citées restent la propriété de leurs auteurs respectifs et ne sont pas reproduits : seuls des liens y renvoient.</p> -->
+      <h3 style="font-size:1rem">Score d'Eisinger</h3>
+      <p class="small">Ce score a été conçu dans le cadre d'un travail financé par le ministère de la Santé, la Ligue nationale contre le cancer, la FNCLCC (devenue Unicancer), l'INSERM et grâce au travail bénévole des experts. Conformément à la doctrine de l'INSERM, le copyright n'est pas abandonné mais ne s'exerce pas non plus.</p>
+      <p class="small muted" style="margin-bottom:0"><strong>Référence du score :</strong>  Eisinger F, Bressac B, Castaigne D, et al. Identification et prise en charge des prédispositions héréditaires aux cancers du sein et de l’ovaire (mise à jour 2004). <em>Bull Cancer 2004;91(3):219-237 </em>. <br>
+Institut national du cancer. Dépistage des cancers du sein : orienter vos patientes en fonction de leur niveau de risque – Score d’Eisinger.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p><strong style="color:#fff">Orient'Oncogénétique</strong> <span id="annee2">2026</span>.</p>
+    <p>Outil destiné aux professionnels de santé. Il ne constitue ni un diagnostic, ni un avis médical, ni une prescription. Il porte uniquement sur les prédispositions aux cancers du sein et de l'ovaire. En cas de doute, l'orientation vers le médecin traitant prime toujours.</p>
+    <p style="margin-bottom:0">La check-list ne collecte, n'enregistre ni ne transmet aucune donnée. Le questionnaire d'évaluation, facultatif et anonyme, est hébergé par Google Forms et ne se charge qu'à votre demande.</p>
+  </div>
+</footer>
+
+<!-- zones imprimables -->
+<div id="print-root">
+  <div id="fiche"></div>
+
+  <!-- fiche de recueil remise à la personne (sans score) -->
+  <div id="grille">
+    <h2>Recueil des antécédents familiaux</h2>
+    <p class="small muted">Fiche à compléter chez vous, puis à rapporter à votre pharmacie.</p>
+
+    <div class="fbloc fbloc-cas">
+      <table class="recueil">
+        <thead><tr><th>Membre de la famille concerné</th><th>Côté maternel<br>ou paternel</th><th>Cancer du sein<br>ou de l'ovaire</th><th>Âge au diagnostic</th></tr></thead>
+        <tbody>
+          <tr><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="fbloc">
+      <h3>Comment compléter cette fiche ?</h3>
+      <p>Renseignez, dans la mesure du possible, les cancers du sein et de l'ovaire survenus dans votre famille, en précisant pour chaque personne concernée le lien de parenté, le côté maternel ou paternel et l'âge au moment du diagnostic.</p>
+      <p>Rapportez ensuite cette fiche à votre pharmacie : ces informations permettront au professionnel de santé de réaliser l'évaluation à l'aide de l'outil Orient'Oncogénétique.</p>
+    </div>
+
+    <div class="fpied">
+      Cette fiche sert uniquement à réunir des informations familiales. Elle ne constitue ni un diagnostic, ni un avis médical. Si vous ne connaissez pas toutes les informations, rapportez la fiche telle quelle.
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* types de cas ; sansAge : pas d'âge à saisir */
+  var ITEMS = [
+    {v:"", t:"— Choisir —"},
+    {v:"seinf",  t:"Cancer du sein (femme)", lib:"Cancer du sein chez une femme"},
+    {v:"seinh",  t:"Cancer du sein (homme)", lib:"Cancer du sein chez un homme"},
+    {v:"ovaire", t:"Cancer de l'ovaire", lib:"Cancer de l'ovaire"},
+    {v:"brca",   t:"Mutation BRCA1/2 identifiée", lib:"Mutation BRCA1/2 identifiée chez un apparenté", sansAge:true}
+  ];
+
+  /* score d'Eisinger, version INCa */
+  function ptsEisinger(type, age){
+    switch(type){
+      case "brca":  return 5;
+      case "seinh": return 4;
+      case "ovaire": return age < 70 ? 4 : 0;
+      case "seinf":
+        if(age < 30) return 4;
+        if(age < 40) return 3;
+        if(age < 50) return 2;
+        if(age <= 70) return 1;
+        return 0;
+      default: return 0;
+    }
+  }
+
+  var BRANCHES = [
+    {v:"", t:"— Qui ? —"},
+    {v:"self", t:"La personne elle-même"},
+    {v:"mat",  t:"Branche maternelle"},
+    {v:"pat",  t:"Branche paternelle"}
+  ];
+
+  var liste = document.getElementById("liste-cas");
+  var resultat = document.getElementById("resultat");
+  var fiche = document.getElementById("fiche");
+
+  var an = new Date().getFullYear();
+  ["annee","annee2"].forEach(function(id){
+    var e = document.getElementById(id); if(e) e.textContent = an;
+  });
+
+  /* Fiche sur une page A4 : on la mesure hors écran et on réduit --fs tant
+     qu'elle dépasse. Safari ignore @page, d'où des dimensions plus petites. */
+  var SAFARI = /^((?!chrome|chromium|crios|edg|fxios|android|opr).)*safari/i.test(navigator.userAgent);
+  var PAGE_H_MM = SAFARI ? 250 : 268;
+  var PAGE_L_MM = SAFARI ? 170 : 182;
+  document.documentElement.style.setProperty("--page-h", PAGE_H_MM + "mm");
+
+  function mmEnPx(){
+    var sonde = document.createElement("div");
+    sonde.style.cssText = "position:absolute; visibility:hidden; height:100mm";
+    document.body.appendChild(sonde);
+    var px = sonde.getBoundingClientRect().height / 100;
+    document.body.removeChild(sonde);
+    return px;
+  }
+
+  function ajusterFiche(){
+    if(!fiche.innerHTML) return;
+    var racine = document.getElementById("print-root");
+    var dispo = PAGE_H_MM * mmEnPx();
+
+    racine.style.cssText = "display:block; position:absolute; left:-10000px; top:0; width:" + PAGE_L_MM + "mm; visibility:hidden";
+    fiche.style.cssText = "display:flex; flex-direction:column; height:auto";
+
+    var s = 1;
+    fiche.style.setProperty("--fs", s);
+    while(fiche.getBoundingClientRect().height > dispo && s > 0.62){
+      s = Math.round((s - 0.02) * 100) / 100;
+      fiche.style.setProperty("--fs", s);
+    }
+
+    racine.style.cssText = "";
+    fiche.style.cssText = "";
+    fiche.style.setProperty("--fs", s);
+  }
+
+  /* impression : une classe sur <body> choisit la zone imprimée */
+  function imprimer(cls){
+    document.body.classList.add(cls);
+    var nettoyer = function(){ document.body.classList.remove(cls); };
+    if(window.matchMedia){
+      var mq = window.matchMedia("print");
+      var onChange = function(m){ if(!m.matches){ nettoyer(); } };
+      if(mq.addEventListener) mq.addEventListener("change", onChange);
+      else if(mq.addListener) mq.addListener(onChange);
+    }
+    window.addEventListener("afterprint", nettoyer, {once:true});
+    setTimeout(function(){ window.print(); }, 50);
+    setTimeout(nettoyer, 120000); // au cas où afterprint ne se déclenche pas
+  }
+
+  function opt(sel, arr){
+    arr.forEach(function(o){
+      var e = document.createElement("option");
+      e.value = o.v; e.textContent = o.t;
+      sel.appendChild(e);
+    });
+  }
+
+  function ligne(){
+    var row = document.createElement("div");
+    row.className = "cas";
+
+    var sb = document.createElement("select");
+    sb.setAttribute("aria-label","Branche parentale");
+    opt(sb, BRANCHES);
+
+    var si = document.createElement("select");
+    si.setAttribute("aria-label","Type de cancer");
+    opt(si, ITEMS);
+
+    var sa = document.createElement("input");
+    sa.type = "number"; sa.min = "0"; sa.max = "120"; sa.step = "1";
+    sa.className = "age"; sa.placeholder = "Âge";
+    sa.setAttribute("inputmode","numeric");
+    sa.setAttribute("aria-label","Âge au diagnostic");
+
+    var act = document.createElement("div");
+    act.className = "cas-actions";
+    var pts = document.createElement("span");
+    pts.className = "pts"; pts.textContent = "—";
+    var del = document.createElement("button");
+    del.type = "button"; del.className = "btn-suppr"; del.innerHTML = "&times;";
+    del.setAttribute("aria-label","Supprimer ce cas");
+    del.addEventListener("click", function(){ row.remove(); if(!liste.children.length) ligneVide(); calcul(); });
+    act.appendChild(pts); act.appendChild(del);
+
+    function maj(){
+      var it = trouver(si.value);
+      var sansAge = it && it.sansAge;
+      sa.disabled = !!sansAge;
+      sa.placeholder = sansAge ? "—" : "Âge";
+      if(sansAge) sa.value = "";
+      var c = lireLigne(row);
+      if(c && !c.exclu) pts.textContent = c.pE + " pt" + (c.pE > 1 ? "s" : "");
+      else pts.textContent = "—";
+      calcul();
+    }
+    sb.addEventListener("change", maj);
+    si.addEventListener("change", maj);
+    sa.addEventListener("input", maj);
+
+    row.appendChild(sb); row.appendChild(si); row.appendChild(sa); row.appendChild(act);
+    row._b = sb; row._i = si; row._a = sa;
+    return row;
+  }
+
+  function ligneVide(){ liste.appendChild(ligne()); }
+
+  function trouver(v){ return ITEMS.filter(function(x){ return x.v === v; })[0]; }
+
+  /* null si la ligne est incomplète ; mutation chez la personne elle-même : exclu */
+  function lireLigne(row){
+    if(!row._b || !row._i) return null;
+    var b = row._b.value, v = row._i.value;
+    if(!b || !v) return null;
+    if(b === "self" && v === "brca") return {exclu:true};
+    var it = trouver(v), age = null;
+    if(!it.sansAge){
+      if(row._a.value === "") return null;
+      age = parseFloat(row._a.value);
+      if(isNaN(age) || age < 0 || age > 120) return null;
+    }
+    return {branche:b, item:it, age:age, pE:ptsEisinger(v, age)};
+  }
+
+  function lire(){
+    var out = [];
+    Array.prototype.forEach.call(liste.children, function(row){
+      var c = lireLigne(row);
+      if(c) out.push(c);
+    });
+    return out;
+  }
+
+  var RAPPEL = "Si l'histoire familiale change — nouveau cas de cancer, précision sur un âge au diagnostic ou sur l'organe atteint — le score doit être réévalué.";
+
+  function calcul(){
+    var cas = lire();
+
+    if(cas.some(function(c){ return c.exclu; })){
+      resultat.className = "resultat neutre";
+      resultat.innerHTML = "<strong>Check-list non indiquée.</strong> La personne est elle-même porteuse d'une mutation identifiée : elle a déjà bénéficié d'une consultation d'oncogénétique et des recommandations de suivi adaptées. Rappeler l'intérêt de ce suivi et l'orienter, si besoin, vers l'équipe qui la suit ou vers les associations de patients (voir « Pour aller plus loin »).";
+      fiche.innerHTML = "";
+      return;
+    }
+
+    if(!cas.length){
+      resultat.className = "resultat neutre";
+      resultat.textContent = "Renseignez au moins un cas (qui, cancer, âge au diagnostic) pour obtenir le score et la conduite à tenir.";
+      fiche.innerHTML = "";
+      return;
+    }
+
+    var self = 0, mat = 0, pat = 0;
+    cas.forEach(function(c){
+      if(c.branche === "self") self += c.pE;
+      else if(c.branche === "mat") mat += c.pE;
+      else pat += c.pE;
+    });
+    var sMat = mat + self, sPat = pat + self;
+    var score = Math.max(sMat, sPat);
+    var orienter = score >= 3;
+
+    var html = '<div class="score-ligne"><span class="score-val">' + score + '</span>' +
+      '<span class="score-lab">' + (orienter
+        ? "Consultation d'oncogénétique indiquée"
+        : "Pas d'indication sur ce seul critère") + '</span></div>';
+
+    html += '<div class="branches">' +
+      '<div class="branche' + (sMat >= sPat ? ' retenue' : '') + '">' +
+        '<div class="b-lab">Branche maternelle</div><div class="b-val">' + sMat + '</div>' +
+        (sMat >= sPat ? '<div class="b-note">score retenu</div>' : '<div class="b-note">&nbsp;</div>') +
+      '</div>' +
+      '<div class="branche' + (sPat > sMat ? ' retenue' : '') + '">' +
+        '<div class="b-lab">Branche paternelle</div><div class="b-val">' + sPat + '</div>' +
+        (sPat > sMat ? '<div class="b-note">score retenu</div>' : '<div class="b-note">&nbsp;</div>') +
+      '</div>' +
+      '<div class="branche">' +
+        '<div class="b-lab">Antécédents personnels</div><div class="b-val">' + self + '</div>' +
+        '<div class="b-note">' + (self > 0 ? 'comptés dans les deux branches' : 'aucun') + '</div>' +
+      '</div>' +
+    '</div>';
+
+    html += '<div class="regle-calcul">Chaque branche est calculée séparément ; les antécédents personnels sont ajoutés aux deux. Le score retenu est le plus élevé des deux totaux.</div>';
+
+    if(orienter){
+      html += '<div class="conduite"><strong>Conduite à tenir</strong>' +
+        '<ul>' +
+        '<li>Expliquer à la personne que son histoire personnelle et familiale peut justifier un avis spécialisé. Une consultation d\'oncogénétique est avant tout une <strong>consultation d\'information</strong> : elle n\'implique pas nécessairement la réalisation d\'un test génétique.</li>' +
+        '<li>L\'inviter à en parler à un médecin — <strong>médecin traitant, gynécologue ou oncologue</strong> — et lui remettre la fiche imprimable ci-dessous. Selon les centres, les modalités d\'adressage varient : certains acceptent une demande directe de la personne, d\'autres demandent un courrier médical.</li>' +
+        '<li>L\'encourager à réunir, avant la consultation, pour chaque <strong>membre de la famille concerné</strong> : le lien de parenté, l\'organe atteint et l\'âge au moment du diagnostic.</li>' +
+        '<li>Repérer le centre le plus proche dans l\'annuaire national et lui indiquer la ville de rattachement ainsi que les coordonnées de la consultation.</li>' +
+        '</ul></div>' +
+        '<div class="rappel-reeval">' + RAPPEL + '</div>' +
+        '<p style="margin:14px 0 0"><a class="lien-annuaire" href="https://www.cancer.fr/professionnels-de-sante/l-organisation-de-l-offre-de-soins/organisation-des-soins-pour-les-predispositions-genetiques/le-dispositif-national-d-oncogenetique" target="_blank" rel="noopener">Trouver la consultation la plus proche →</a></p>';
+    } else {
+      html += '<div class="conduite"><strong>Conduite à tenir</strong>' +
+        '<ul>' +
+        '<li>Rappeler l\'intérêt du <strong>dépistage organisé</strong> du cancer du sein, tous les deux ans de 50 à 74 ans, et la conduite à tenir devant tout symptôme mammaire, à tout âge.</li>' +
+        '<li>Préciser qu\'un score inférieur à 3 ne signifie pas une absence de risque : ce résultat porte sur le seul critère familial du score d\'Eisinger, pour les cancers du sein et de l\'ovaire. D\'autres facteurs de risque relèvent de l\'expertise du médecin.</li>' +
+        '<li>Orienter vers le médecin traitant en cas de doute, de symptôme, ou d\'antécédents concernant d\'autres localisations que le sein et l\'ovaire.</li>' +
+        '</ul></div>' +
+        '<div class="rappel-reeval">' + RAPPEL + '</div>';
+    }
+
+    html += '<div class="btn-row no-print" style="margin-top:16px">' +
+      '<button class="btn" type="button" id="imprimer">Imprimer la fiche à remettre</button></div>';
+
+    resultat.className = "resultat " + (orienter ? "orienter" : "standard");
+    resultat.innerHTML = html;
+    document.getElementById("imprimer").addEventListener("click", function(){ ajusterFiche(); imprimer("print-fiche"); });
+
+    construireFiche(cas, score, sMat, sPat, self, orienter);
+  }
+
+  function construireFiche(cas, score, sMat, sPat, self, orienter){
+    var libs = {self:"la personne elle-même", mat:"branche maternelle", pat:"branche paternelle"};
+    var lignes = cas.map(function(c){
+      return "<li>" + c.item.lib + (c.age !== null ? " à " + c.age + " ans" : "") +
+        " — <em>" + libs[c.branche] + "</em> (" + c.pE + " pt" + (c.pE>1?"s":"") + ")</li>";
+    }).join("");
+
+    var d = new Date();
+    var dstr = ("0"+d.getDate()).slice(-2) + "/" + ("0"+(d.getMonth()+1)).slice(-2) + "/" + d.getFullYear();
+
+    var suite = orienter
+      ? "<h3>Ce qui vous est proposé</h3>" +
+        "<p>Votre histoire personnelle et familiale peut justifier un <strong>avis en consultation d'oncogénétique</strong>. Il ne s'agit pas d'un diagnostic. C'est une <strong>consultation d'information</strong> : un médecin reconstitue avec vous l'histoire de votre famille et détermine s'il y a lieu, ou non, de vous proposer une analyse génétique. Elle n'implique pas nécessairement un test.</p>" +
+        "<h3>Comment procéder</h3>" +
+        "<ol><li>Parlez-en à un médecin : votre médecin généraliste, votre gynécologue ou votre oncologue, et remettez-lui cette fiche.</li>" +
+        "<li>Selon les centres, la demande de rendez-vous peut être faite par ce médecin ou directement par vous. Les modalités sont précisées par la consultation d'oncogénétique de votre région.</li>" +
+        "<li>Avant la consultation, réunissez, pour chaque membre de votre famille concerné : le lien de parenté, l'organe atteint et l'âge au moment du diagnostic.</li></ol>" +
+        "<h3>Trouver la consultation la plus proche</h3>" +
+        "<p>L'Institut national du cancer publie la carte et l'annuaire des sites de consultation d'oncogénétique en France :<br><strong>cancer.fr</strong> → Professionnels de santé → L'organisation de l'offre des soins → Organisation des soins pour les prédispositions génétiques → Le dispositif national.</p>"
+      : "<h3>Ce que cela signifie</h3>" +
+        "<p>Sur le seul critère de l'histoire familiale de cancers du sein et de l'ovaire, votre situation ne relève pas aujourd'hui d'une consultation d'oncogénétique. Cela ne veut pas dire que le risque est nul : cela veut dire que le <strong>dépistage habituel</strong> est adapté à votre situation. D'autres facteurs de risque existent et relèvent de l'appréciation de votre médecin.</p>" +
+        "<h3>Ce qui reste important</h3>" +
+        "<ol><li>Participez au dépistage organisé du cancer du sein : une mammographie tous les deux ans, de 50 à 74 ans, prise en charge à 100 %.</li>" +
+        "<li>Consultez sans attendre devant toute anomalie du sein, à tout âge : boule, modification de la peau ou du mamelon, écoulement.</li>" +
+        "<li>Parlez à votre médecin de tout antécédent de cancer dans votre famille concernant d'autres organes : ils relèvent d'une autre évaluation que celle-ci.</li></ol>";
+
+    var ressources = orienter
+      ? "<h3>Pour mieux comprendre</h3>" +
+        "<p>Pour mieux comprendre ce qu'est une consultation d'oncogénétique, vous trouverez des supports vidéo et écrits ci-dessous.</p>" +
+        "<ul><li>Institut Curie, « La recherche d'une prédisposition », D<sup>r</sup> Emmanuelle Mouret-Fourme (vidéo) — youtube.com/watch?v=KMxWc9Lu-FE</li>" +
+        "<li>Institut national du cancer, « La consultation d'oncogénétique » — cancer.fr/personnes-malades/parcours-de-soins/temps-d-annonce/consultation-d-oncogenetique</li>" +
+        "<li>Institut Curie, « La prédisposition au cancer du sein et de l'ovaire » (vidéo) — youtube.com/watch?v=XG0jhdITXBg</li></ul>"
+      : "<h3>Pour mieux comprendre le dépistage</h3>" +
+        "<p>Pour mieux comprendre le dépistage du cancer du sein et ses modalités, vous trouverez des supports d'information ci-dessous.</p>" +
+        "<ul><li>Institut national du cancer, « Le dépistage du cancer du sein » — cancer.fr → Toute l'information sur les cancers → Se faire dépister → Les dépistages → Dépistage du cancer du sein</li>" +
+        "<li>Assurance Maladie, « Cancer du sein » — ameli.fr/assure/sante/themes/cancer-sein</li>" +
+        "<li>Santé publique France, « Cancer du sein » — santepubliquefrance.fr/cancers/cancer-du-sein</li></ul>";
+
+    fiche.innerHTML =
+      '<h2>Fiche d\'information — orientation en oncogénétique</h2>' +
+      '<p class="small muted">Remise le ' + dstr + ' par votre pharmacie. Document d\'information portant sur les prédispositions aux cancers du sein et de l\'ovaire, à présenter à votre médecin.</p>' +
+      '<div class="fres"><strong>Score d\'Eisinger : ' + score + '</strong><div class="fbranches">' +
+        '<div>Branche maternelle : ' + sMat + '</div>' +
+        '<div>Branche paternelle : ' + sPat + '</div>' +
+        '<div>Antécédents personnels : ' + self + '</div></div>' +
+      '<p style="margin:10px 0 0">' +
+      (orienter ? "Seuil de 3 atteint : <strong>une consultation d'oncogénétique est indiquée</strong>."
+                : "Seuil de 3 non atteint : <strong>dépistage habituel</strong>, pas d'indication à une consultation d'oncogénétique sur ce critère.") + '</p></div>' +
+      '<div class="fbloc"><h3>Éléments recueillis</h3><ul>' + lignes + '</ul>' +
+      '<p class="small muted">Le score d\'Eisinger n\'additionne que les cas d\'une même branche de la famille, maternelle ou paternelle. Les antécédents personnels comptent dans les deux. Le score retenu est le plus élevé des deux totaux.</p></div>' +
+      '<div class="fbloc">' + suite + '</div>' +
+      '<div class="fbloc"><h3>Si votre histoire familiale change</h3>' +
+      '<p>Ce résultat reflète les informations connues aujourd\'hui. Si un nouveau cas de cancer survient dans votre famille, ou si vous obtenez des précisions sur les âges au diagnostic ou les organes atteints, <strong>reparlez-en à votre médecin ou à votre pharmacie : le score doit être réévalué</strong>.</p></div>' +
+      '<div class="fbloc">' + ressources + '</div>';
+
+    ajusterFiche();
+  }
+
+  document.getElementById("ajouter").addEventListener("click", function(){ liste.appendChild(ligne()); });
+  document.getElementById("reinit").addEventListener("click", function(){
+    liste.innerHTML = ""; ligneVide(); ligneVide(); calcul();
+  });
+  document.getElementById("imprimer-recueil").addEventListener("click", function(){ imprimer("print-grille"); });
+
+  ligneVide(); ligneVide();
+  calcul();
+
+  /* questionnaire Google Forms : l'iframe n'est chargée qu'au clic */
+  var FORMULAIRE_URL = "https://docs.google.com/forms/d/e/1FAIpQLScA0XXDuQoOL6ywJmp02C8OP6qV5uODvepXDzIm9E3hm2vnnQ/viewform";
+
+  var zoneQ = document.getElementById("questionnaire-zone");
+  zoneQ.innerHTML =
+    '<div class="btn-row"><button class="btn" type="button" id="ouvrir-questionnaire">Répondre au questionnaire</button>' +
+    '<a class="lien-secours" href="' + FORMULAIRE_URL + '" target="_blank" rel="noopener">ou l\'ouvrir dans un nouvel onglet ↗</a></div>';
+  document.getElementById("ouvrir-questionnaire").addEventListener("click", function(){
+    var f = document.createElement("iframe");
+    f.src = FORMULAIRE_URL + "?embedded=true";
+    f.title = "Questionnaire d'évaluation Orient'Oncogénétique";
+    zoneQ.appendChild(f);
+    this.remove();
+  });
+})();
+</script>
+
+</body>
+</html>
